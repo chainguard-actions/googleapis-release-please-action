@@ -1,5 +1,7 @@
 # googleapis/release-please-action
 
+automated releases based on conventional commits
+
 Hardened by [Chainguard](https://www.chainguard.dev) from the upstream action at [https://github.com/googleapis/release-please-action](https://github.com/googleapis/release-please-action).
 
 ## Versions
