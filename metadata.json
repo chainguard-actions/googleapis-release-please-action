@@ -1,7 +1,0 @@
-{
-  "owner": "googleapis",
-  "name": "release-please-action",
-  "visibility": "internal",
-  "description": "automated releases based on conventional commits",
-  "block_publish": false
-}
