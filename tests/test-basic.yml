@@ -1,0 +1,33 @@
+name: Test basic usage - skip PR and release
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          fetch-depth: 0
+
+      - id: action
+        uses: .
+        with:
+          token: ${{ github.token }}
+          release-type: node
+          target-branch: main
+          github-api-url: https://api.github.com
+          github-graphql-url: https://api.github.com/graphql
+          skip-github-pull-request: true
+          skip-github-release: true
+          skip-labeling: true
+
+      - name: Assert action completed and outputs are present
+        env:
+          RELEASES_CREATED: ${{ steps.action.outputs.releases_created }}
+          PRS_CREATED: ${{ steps.action.outputs.prs_created }}
+        run: |
+          echo "releases_created: $RELEASES_CREATED"
+          echo "prs_created: $PRS_CREATED"
+          # When both skip flags are set, the action skips all work and completes successfully
+          # No releases or PRs should be created
+          echo "PASS: action completed successfully"

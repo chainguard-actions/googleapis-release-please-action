@@ -1,0 +1,35 @@
+name: Test release-as and versioning-strategy inputs
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          fetch-depth: 0
+
+      - id: action
+        uses: .
+        with:
+          token: ${{ github.token }}
+          release-type: node
+          release-as: 1.2.3
+          versioning-strategy: default
+          target-branch: main
+          github-api-url: https://api.github.com
+          github-graphql-url: https://api.github.com/graphql
+          skip-github-pull-request: true
+          skip-github-release: true
+          skip-labeling: true
+
+      - name: Assert action completed with release-as input
+        env:
+          RELEASES_CREATED: ${{ steps.action.outputs.releases_created }}
+          PRS_CREATED: ${{ steps.action.outputs.prs_created }}
+        run: |
+          echo "releases_created: $RELEASES_CREATED"
+          echo "prs_created: $PRS_CREATED"
+          # The action should complete without error when release-as is specified
+          # with both skip flags set - no actual PR or release is created
+          echo "PASS: action completed successfully with release-as and versioning-strategy inputs"

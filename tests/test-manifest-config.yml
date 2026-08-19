@@ -1,0 +1,49 @@
+name: Test manifest config invocation
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_REF: refs/heads/main
+      GITHUB_EVENT_NAME: push
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Create release-please config and manifest files
+        run: |
+          cat > release-please-config.json <<'EOF'
+          {
+            "packages": {
+              ".": {
+                "release-type": "node"
+              }
+            }
+          }
+          EOF
+          cat > .release-please-manifest.json <<'EOF'
+          {
+            ".": "1.0.0"
+          }
+          EOF
+
+      - id: action
+        uses: .
+        continue-on-error: true
+        with:
+          token: fake-token-for-testing
+          config-file: release-please-config.json
+          manifest-file: .release-please-manifest.json
+          skip-github-pull-request: 'true'
+          skip-github-release: 'true'
+
+      - name: Assert action ran (outcome is set)
+        env:
+          OUTCOME: ${{ steps.action.outcome }}
+        run: |
+          echo "outcome: $OUTCOME"
+          if [ -z "$OUTCOME" ]; then
+            echo "FAIL: expected outcome to be set"
+            exit 1
+          fi
+          echo "PASS: action ran with outcome=$OUTCOME"

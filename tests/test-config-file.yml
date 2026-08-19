@@ -1,0 +1,32 @@
+name: Test config-file and manifest-file inputs
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          fetch-depth: 0
+
+      - id: action
+        uses: .
+        with:
+          token: ${{ github.token }}
+          config-file: release-please-config.json
+          manifest-file: .release-please-manifest.json
+          target-branch: main
+          github-api-url: https://api.github.com
+          github-graphql-url: https://api.github.com/graphql
+          skip-github-pull-request: true
+          skip-github-release: true
+          skip-labeling: true
+
+      - name: Assert action completed with config file
+        env:
+          RELEASES_CREATED: ${{ steps.action.outputs.releases_created }}
+        run: |
+          echo "releases_created: $RELEASES_CREATED"
+          # Action should complete without error when using config/manifest files
+          # with both skip flags set - no API calls for releases or PRs are made
+          echo "PASS: action completed successfully with config-file and manifest-file inputs"
